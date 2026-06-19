@@ -28,10 +28,16 @@ export default async function CotizacionesPage() {
     })
   ]);
 
+  // Convert Date -> string for client (client components expect serializable props)
+  const serializableCotizaciones = cotizaciones.map((c) => ({
+    ...c,
+    fecha: c.fecha instanceof Date ? c.fecha.toISOString() : String(c.fecha)
+  }));
+
   return (
     <>
       <PageHeader title="Cotizaciones" description="Carga, detecta y guarda precios con cotizaciones para comparación y historial." />
-      <CotizacionesAdmin providers={proveedores} products={productos} cotizaciones={cotizaciones} />
+      <CotizacionesAdmin providers={proveedores} products={productos} cotizaciones={serializableCotizaciones} />
     </>
   );
 }
