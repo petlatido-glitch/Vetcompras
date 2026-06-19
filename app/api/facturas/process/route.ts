@@ -16,7 +16,7 @@ async function extractTextFromPDF(uint8: Uint8Array) {
     type TextItem = { str: string; x: number; y: number; width: number };
     const itemsByLine: Map<number, TextItem[]> = new Map();
 
-    for (const item of content.items as TextItem[]) {
+    for (const item of content.items as unknown as TextItem[]) {
       const y = Math.round(item.y);
       if (!itemsByLine.has(y)) {
         itemsByLine.set(y, []);
@@ -59,9 +59,7 @@ async function extractTextFromPDF(uint8: Uint8Array) {
 }
 
 async function extractTextFromImage(buffer: Uint8Array) {
-  const worker = createWorker({
-    // logger: (m) => console.log("tesseract", m)
-  });
+  const worker = await createWorker({} as any);
   try {
     await worker.load();
     await worker.loadLanguage("spa");

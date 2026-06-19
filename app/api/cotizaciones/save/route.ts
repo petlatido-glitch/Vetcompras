@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { normalizeProductName } from "@/lib/cotizacion-parser";
+import type { Prisma } from "@prisma/client";
 
 async function ensureCotizacionItemColumns() {
   await prisma.$executeRaw`ALTER TABLE "cotizacion_items" ADD COLUMN IF NOT EXISTS "nombre_ocr" TEXT`;
@@ -58,7 +59,7 @@ export async function POST(request: Request) {
       }
     });
 
-    const operations = [] as Array<Promise<unknown>>;
+    const operations: Prisma.PrismaPromise<unknown>[] = [];
 
     // Ensure cotizacion_items.producto_id accepts NULL so we can store items
     // without linking to Producto when no match is found. Idempotent.

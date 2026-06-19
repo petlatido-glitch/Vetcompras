@@ -1,6 +1,7 @@
 import { PageHeader } from "@/components/app/page-header";
 import { prisma } from "@/lib/prisma";
 import { CotizacionesAdmin } from "@/components/cotizaciones/cotizaciones-admin";
+import { serializeForClientAny } from "@/lib/serialize";
 
 export default async function CotizacionesPage() {
   const [proveedores, productos, cotizaciones] = await Promise.all([
@@ -28,11 +29,10 @@ export default async function CotizacionesPage() {
     })
   ]);
 
-  // Convert Date -> string for client (client components expect serializable props)
-  const serializableCotizaciones = cotizaciones.map((c) => ({
-    ...c,
-    fecha: c.fecha instanceof Date ? c.fecha.toISOString() : String(c.fecha)
-  }));
+  // Serialize DB results (Date, Decimal) for client consumption
+  const serializableCotizaciones = serializeForClientAny(cotizaciones);
+  const serializableProviders = serializeForClientAny(proveedores);
+  const serializableProducts = serializeForClientAny(productos);
 
   return (
     <>
