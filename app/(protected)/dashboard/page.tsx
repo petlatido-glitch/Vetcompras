@@ -3,6 +3,7 @@ import { subDays } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { prisma } from "@/lib/prisma";
+import { serializeForClientAny } from "@/lib/serialize";
 import { buildComparison } from "@/lib/comparison";
 import { formatCurrency } from "@/lib/utils";
 
@@ -21,13 +22,13 @@ export default async function DashboardPage() {
 
   const comparison = buildComparison(
     cotizacionItems.map((item) => ({
-      productoId: item.productoId,
-      productoNombre: item.producto.nombre,
+      productoId: item.productoId ?? "",
+      productoNombre: item.producto?.nombre ?? "",
       proveedorId: item.cotizacion.proveedorId,
-      proveedorNombre: item.cotizacion.proveedor.nombre,
+      proveedorNombre: item.cotizacion.proveedor?.nombre ?? "",
       precio: item.precio
     })),
-    lista.map((item) => ({ productoId: item.productoId, cantidadRequerida: item.cantidadRequerida }))
+    lista.map((item) => ({ productoId: item.productoId ?? "", cantidadRequerida: item.cantidadRequerida }))
   );
 
   const stats = [
@@ -76,7 +77,7 @@ export default async function DashboardPage() {
             <CardTitle className="text-xl font-semibold">Lista de compra prioritaria</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 px-7 pb-7 pt-0">
-            {lista.map((item) => (
+            {serializeForClientAny(lista).map((item: any) => (
               <div key={item.id} className="flex items-center justify-between gap-4 rounded-[1.75rem] border border-[#E9DDD4] bg-[#FFFCF8] p-5">
                 <div>
                   <p className="font-semibold text-slate-900">{item.producto.nombre}</p>
@@ -85,6 +86,7 @@ export default async function DashboardPage() {
                 <Badge className="bg-[#FFF1E7] text-[#B7632C]">{item.cantidadRequerida} {item.producto.unidad}</Badge>
               </div>
             ))}
+            {lista.length === 0 && <p className="text-sm text-slate-500">No hay productos pendientes.</p>}
             {lista.length === 0 && <p className="text-sm text-slate-500">No hay productos pendientes.</p>}
           </CardContent>
         </Card>
